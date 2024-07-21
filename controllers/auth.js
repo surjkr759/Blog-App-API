@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const { generateToken } = require('../lib/auth')
 
 exports.handleSignupRequest = async (req, res) => {
-    const { firstName, lastName, email, password } = req.body
+    const { firstName, lastName, email, password, isAdmin } = req.body
 
     try {
         const salt = crypto.randomBytes(256).toString('hex')
@@ -14,7 +14,8 @@ exports.handleSignupRequest = async (req, res) => {
             lastName,
             email,
             password: hashedPassword,
-            salt
+            salt,
+            isAdmin: isAdmin === true
         })
         return res.status(200).json({message: 'success', data: {_id: newUser._id}})
     } catch (err) {
@@ -31,7 +32,6 @@ exports.handleSigninRequest = async (req, res) => {
 
     const salt = userInDb.salt
     const passwordInDb = userInDb.password
-    console.log('Salt ', salt)
     const hashedPassword = crypto.createHmac('sha256', salt).update(password).digest('hex')
 
     if(passwordInDb !== hashedPassword)

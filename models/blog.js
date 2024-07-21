@@ -12,6 +12,26 @@ const blogSchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
+    },
+    likes: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    likedBy: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'users',
+        default: []
+    },
+    dislikes: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    dislikedBy: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'users',
+        default: []
     }
 }, { timestamps: true})
 
