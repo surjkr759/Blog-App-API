@@ -15,7 +15,8 @@ exports.handleGetBlogById = async (req, res) => {
     if(!blog)
         return res.status(404).json({status: 'error', message: `Id ${id} not found`})
 
-    return res.status(200).json({ status: 'success', data: blog})
+    // return res.status(200).json({ status: 'success', data: blog})
+    return res.render('blog', {blog})
 }
 
 
@@ -29,23 +30,12 @@ exports.handleCreateNewBlog = async (req, res) => {
         createdBy: userId
     })
 
-    return res.status(200).json({ status: 'success', message: 'Blog created successfully', data: { id: newBlog._id}})
+    // return res.status(200).json({ status: 'success', message: 'Blog created successfully', data: { id: newBlog._id}})
+    return res.redirect(`/blog/${newBlog.id}`)
 }
 
 
 exports.handleDeleteBlogById = async (req, res) => {
-    // const blogId = req.params.id
-    // const blog = await Blog.findById(blogId)
-    // const blogCreatedBy = JSON.stringify(blog.createdBy)
-
-    // const userId = JSON.stringify(req.user._id)
-
-    // if(userId !== blogCreatedBy)
-    //     return res.status(401).json({status: 'error', message: 'You are not authorized to delete the blog'})
-
-    // await Blog.findByIdAndDelete(blogId)
-    // return res.status(200).json({status: 'success', message: 'Blog Deleted'})
-
     const blogId = req.params.id
     const userId = req.user._id
 
@@ -55,35 +45,44 @@ exports.handleDeleteBlogById = async (req, res) => {
 
         if(user.isAdmin || JSON.stringify(userId) === JSON.stringify(blog.createdBy)) {
             await Blog.findByIdAndDelete(blogId)
-            return res.status(200).json({status: 'success', message: 'Blog Deleted'})
+            return res.redirect('/')
+            // return res.status(200).json({status: 'success', message: 'Blog Deleted'})
         }
-
-        return res.status(401).json({status: 'error', message: 'You are not authorized to delete the blog'})
+        
+        // return res.status(401).json({status: 'error', message: 'You are not authorized to delete the blog'})
     } catch (err) {
-        return res.status(500).json({status: 'error', message: err.message})
+        return res.redirect('/',  {error: err})
+        // return res.status(500).json({status: 'error', message: err.message})
     }
 }
 
 
 exports.handleUpdateBlogById = async (req, res) => {
     const blogId = req.params.id
-    const blog = await Blog.findById(blogId)
-    const blogCreatedBy = JSON.stringify(blog.createdBy)
+    const userId = req.user._id
 
-    const userId = JSON.stringify(req.user._id)
+    try {
+        const user = await User.findById(userId)
+        const blog = await Blog.findById(blogId)
 
-    if(userId !== blogCreatedBy)
-        return res.status(401).json({status: 'error', message: 'You are not authorized to update the blog'})
-
+        // if(userId !== blogCreatedBy)
+        //     return res.status(401).json({status: 'error', message: 'You are not authorized to update the blog'})
     
-    const { title, body } = req.body
-    const updatedBlog = await Blog.findByIdAndUpdate(
-        blogId,
-        { title, body },
-        { new: true}
-    )
+        if(user.isAdmin || JSON.stringify(userId) === JSON.stringify(blog.createdBy)) {
+            const { title, body } = req.body
+            await Blog.findByIdAndUpdate(
+                blogId,
+                { title, body }
+            )
+            return res.redirect(`/blog/${blogId}`)
+            // return res.status(200).json({status: 'success', message: 'Blog Deleted'})
+        }
 
-    return res.status(200).json({status: 'success', data: updatedBlog})
+        // return res.status(200).json({status: 'success', data: updatedBlog})
+    } catch(err) {
+        return res.redirect('/update',  {error: err})
+    }
+    
 }
 
 
@@ -95,7 +94,11 @@ exports.handleLikeBlogById = async (req, res) => {
         const blog = await Blog.findById(blogId)
 
         if(blog.likedBy.includes(userId))
-            return res.status(400).json({status: 'error', message: 'You have already liked this post'})
+            return res.render('blog', {
+                blog,
+                error: 'You have already liked this post'
+            })
+            // return res.status(400).json({status: 'error', message: 'You have already liked this post'})
 
         if(blog.dislikedBy.includes(userId)) {
             blog.dislikes -= 1
@@ -122,7 +125,11 @@ exports.handleDisikeBlogById = async (req, res) => {
         const blog = await Blog.findById(blogId)
 
         if(blog.dislikedBy.includes(userId))
-            return res.status(400).json({status: 'error', message: 'You have already disliked this post'})
+            return res.render('blog', {
+                blog,
+                error: 'You have already disliked this post'
+            })
+            // return res.status(400).json({status: 'error', message: 'You have already disliked this post'})
 
         if(blog.likedBy.includes(userId)) {
             blog.likes -= 1
@@ -139,26 +146,3 @@ exports.handleDisikeBlogById = async (req, res) => {
         return res.status(500).json({status: 'error', message: err.message})
     }
 }
-
-
-// exports.handleDeleteBlogByAdmin = async (req, res) => {
-//     const blogId = req.params.id
-//     const userId = req.user._id
-
-//     try {
-//         const user = await User.findById(userId)
-//         const blog = await Blog.findById(blogId)
-
-//         if(user.isAdmin || JSON.stringify(userId) === JSON.stringify(blog.createdBy)) {
-//             await Blog.findByIdAndDelete(blogId)
-//             return res.status(200).json({status: 'success', message: 'Blog Deleted'})
-//         }
-
-//         return res.status(401).json({status: 'error', message: 'You are not authorized to delete the blog'})
-//     } catch (err) {
-//         return res.status(500).json({status: 'error', message: err.message})
-//     }
-    
-
-
-// }

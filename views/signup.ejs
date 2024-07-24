@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/css.ejs') %>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+</head>
+<body>
+    <div class="container mt-3">
+        <% if (locals.error) { %>
+            <div class="alert alert-danger" role="alert"><%= locals.error %></div>
+        <% } %>
+        <form method="post" action="/auth/signup">
+            <div class="mb-3">
+              <label for="exampleInputfirstName1" class="form-label">First Name</label>
+              <input type="text" name="firstName" class="form-control" id="exampleInputfirstName1" aria-describedby="emailHelp">
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputlastName1" class="form-label">Last Name</label>
+                <input type="text" name="lastName" class="form-control" id="exampleInputlastName1" aria-describedby="emailHelp">
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Email address</label>
+                <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">Password</label>
+              <input type="password" name="password" class="form-control" id="exampleInputPassword1">
+            </div>
+            <div class="form-floating">
+                <label for="floatingSelect" style="font-size: 12px;">Is Admin?</label>
+                <select name="isAdmin" class="form-select" id="floatingSelect">
+                  <option value="false" selected>False</option>
+                  <!-- <option value="false">False</option> -->
+                  <option value="true">True</option>
+                </select>
+            </div>
+            <br>
+            <div class="mb-3">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+          <button onclick="window.location.href='/'" class="btn btn-primary">Back to Homepage</button>
+    </div>
+</body>
+</html>

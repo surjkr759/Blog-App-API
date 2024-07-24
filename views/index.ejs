@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/css.ejs') %>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogify</title>
+</head>
+<body>
+    <div class="d-flex p-2">
+        <div class="container mt-3">
+            <% if (locals.error) { %>
+                <div class="alert alert-danger" role="alert"><%= locals.error %></div>
+            <% } %>
+            <h1>Welcome to Blogify App</h1>
+            <ul>
+                <% blogs.forEach(blog => { %>
+                    <li>
+                        <a href="/blog/<%= blog._id %>"><%= blog.title %></a>
+                        <% if (isAdmin || userId == blog.createdBy) { %>
+                            <button onclick="updateBlog('<%= blog._id %>')" class="btn btn-danger ml-2 btn-sm">Update</a>
+                            <button onclick="deleteBlog('<%= blog._id %>')" class="btn btn-danger ml-2 btn-sm">Delete</a>
+                        <% } %> 
+                    </li>
+                <% }) %>
+            </ul>
+            <a href="/new">Post your own blog</a>
+        </div>
+        <% if (userId) { %>
+            <div class="d-lg-flex flex-column" style="gap: 10px; height: 40px;">
+                <h6>User:&nbsp;<%= email %></h6>
+                <button onclick="window.location.href = '/logout'" class="btn btn-primary btn-sm" style="width: 60px; align-self: end;">Logout</button>
+            </div>
+        <% } else { %>
+            <div class="d-lg-flex" style="gap: 10px; height: 40px;">
+                <button onclick="window.location.href = '/signup'" class="btn btn-primary btn-sm">Signup</button>
+                <button onclick="window.location.href = '/login'" class="btn btn-primary btn-sm">Login</button>
+            </div>
+        <% } %>
+    </div>
+    
+    <script>
+        async function deleteBlog(blogId) {
+            await fetch(`/blog/${blogId}`, {
+                method: "DELETE"
+            })
+            window.location.reload()
+        }
+
+        async function updateBlog(blogId) {
+            window.location.href = `/update/${blogId}`
+        }
+    </script>
+</body>
+</html>
